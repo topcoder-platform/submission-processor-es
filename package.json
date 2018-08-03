@@ -20,11 +20,13 @@
     "uuid": "^3.3.2"
   },
   "dependencies": {
+    "aws-sdk": "^2.286.2",
     "bluebird": "^3.5.1",
     "co": "^4.6.0",
     "config": "^1.21.0",
     "elasticsearch": "^15.1.1",
     "get-parameter-names": "^0.3.0",
+    "http-aws-es": "^6.0.0",
     "joi": "^9.0.4",
     "lodash": "^4.17.10",
     "no-kafka": "^3.2.4",

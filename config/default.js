@@ -1,6 +1,9 @@
 /**
  * The configuration file.
  */
+const AWS = require('aws-sdk')
+const httpAWSes = require('http-aws-es')
+
 module.exports = {
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
 
@@ -17,7 +20,13 @@ module.exports = {
   // see https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/configuration.html
   // for full config details, for SSL connection, see the ssl field details in above page
   ELASTICSEARCH_CONFIG: {
-    host: process.env.ELASTICSEARCH_HOST || 'localhost:9200'
+    apiVersion: process.env.ES_API_VERSION || '6.3',
+    host: process.env.ELASTICSEARCH_HOST || 'localhost:9200',
+    connectionClass: httpAWSes,
+    amazonES: {
+      region: process.env.AWS_REGION || 'us-east-1',
+      credentials: new AWS.EnvironmentCredentials('AWS')
+    }
   },
 
   ELASTICSEARCH_INDEX: process.env.ELASTICSEARCH_INDEX || 'submission-index',
