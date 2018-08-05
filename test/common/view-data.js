@@ -4,7 +4,7 @@
  * node test/view-data {elasticsearch-id}
  */
 const co = require('co')
-const logger = require('../src/common/logger')
+const logger = require('../../src/common/logger')
 const testHelper = require('./testHelper')
 
 if (process.argv.length < 3) {

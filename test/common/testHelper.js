@@ -5,7 +5,7 @@
 const _ = require('lodash')
 const config = require('config')
 const expect = require('chai').expect
-const helper = require('../src/common/helper')
+const helper = require('../../src/common/helper')
 
 const client = helper.getESClient()
 
@@ -16,8 +16,8 @@ const client = helper.getESClient()
  */
 function * getESData (id) {
   return yield client.getSource({
-    index: config.ELASTICSEARCH_INDEX,
-    type: config.ELASTICSEARCH_INDEX_TYPE,
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
     id
   })
 }

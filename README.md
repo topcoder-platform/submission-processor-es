@@ -7,12 +7,6 @@
 - ElasticSearch
 - Docker, Docker Compose
 
-## Notes
-
-In Elasticsearch v6+, it can support one type per index, see
-https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
-so for all 4 types, same configured index type is used, types are distinguished by the 'resource' attribute of indexed data.
-
 ## Configuration
 
 Configuration for the notification server is at `config/default.js`.
@@ -29,11 +23,8 @@ The following parameters can be set in config files or in env variables:
 - CREATE_DATA_TOPIC: create data Kafka topic, default value is 'submission.notification.create'
 - UPDATE_DATA_TOPIC: update data Kafka topic, default value is 'submission.notification.update'
 - DELETE_DATA_TOPIC: delete data Kafka topic, default value is 'submission.notification.delete'
-- ELASTICSEARCH_CONFIG: the config to create Elasticsearch client, see
-    https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/configuration.html
-    for full details, SSL connection can be configured in ssl config field
-- ELASTICSEARCH_INDEX: the Elasticsearch index to store Kafka messages data, default value is 'submission-index'
-- ELASTICSEARCH_INDEX_TYPE: the Elasticsearch index type name, default value is 'submission'
+
+Refer to `esConfig` variable in `config/default.js` for ES related configuration.
 
 Also note that there is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
@@ -64,10 +55,6 @@ Also note that there is a `/health` endpoint that checks for the health of the a
   `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic submission.notification.create --from-beginning`
 - writing/reading messages to/from other topics are similar
 
-## ElasticSearch setup
-
-- go to docker folder, run `docker-compose up`
-
 ## Local deployment
 
 - install dependencies `npm i`
@@ -76,6 +63,63 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 - or to re-create the index: `npm run init-es force`
 - run tests `npm run test`
 - start processor app `npm start`
+
+## Local Deployment with Docker
+
+To run the Submission ES Processor using docker, follow the below steps
+
+1. Navigate to the directory `docker`
+
+2. Rename the file `sample.api.env` to `api.env`
+
+3. Set the required AWS credentials in the file `api.env`
+
+4. Once that is done, run the following command
+
+```
+docker-compose up
+```
+
+5. When you are running the application for the first time, It will take some time initially to download the image and install the dependencies
+
+## Unit tests and Integration tests
+
+Integration tests use different index `submission-test` which is not same as the usual index `submission`.
+
+Please ensure to create the index `submission-test` or the index specified in the environment variable `ES_INDEX_TEST` before running the Integration tests. You could re-use the existing scripts to create index but you would need to set the below environment variable
+
+```
+export ES_INDEX=submission-test
+```
+
+#### Running unit tests and coverage
+
+To run unit tests alone
+
+```
+npm run test
+```
+
+To run unit tests with coverage report
+
+```
+npm run cov
+```
+
+#### Running integration tests and coverage
+
+To run integration tests alone
+
+```
+npm run e2e
+```
+
+To run integration tests with coverage report
+
+```
+npm run cov-e2e
+```
+
 
 ## Verification
 
