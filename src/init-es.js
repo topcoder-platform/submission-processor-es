@@ -15,20 +15,20 @@ const client = helper.getESClient()
 
 co(function * () {
   if (process.argv.length === 3 && process.argv[2] === 'force') {
-    logger.info(`Delete index ${config.ELASTICSEARCH_INDEX} if any.`)
+    logger.info(`Delete index ${config.esConfig.ES_INDEX} if any.`)
     try {
-      yield client.indices.delete({ index: config.ELASTICSEARCH_INDEX })
+      yield client.indices.delete({ index: config.esConfig.ES_INDEX })
     } catch (err) {
       // ignore
     }
   }
 
-  const exists = yield client.indices.exists({ index: config.ELASTICSEARCH_INDEX })
+  const exists = yield client.indices.exists({ index: config.esConfig.ES_INDEX })
   if (exists) {
-    logger.info(`The index ${config.ELASTICSEARCH_INDEX} exists.`)
+    logger.info(`The index ${config.esConfig.ES_INDEX} exists.`)
   } else {
-    logger.info(`The index ${config.ELASTICSEARCH_INDEX} will be created.`)
-    yield client.indices.create({ index: config.ELASTICSEARCH_INDEX })
+    logger.info(`The index ${config.esConfig.ES_INDEX} will be created.`)
+    yield client.indices.create({ index: config.esConfig.ES_INDEX })
   }
 }).then(() => {
   logger.info('done')

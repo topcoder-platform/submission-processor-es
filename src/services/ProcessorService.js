@@ -15,8 +15,8 @@ const client = helper.getESClient()
  */
 function * create (message) {
   yield client.create({
-    index: config.ELASTICSEARCH_INDEX,
-    type: config.ELASTICSEARCH_INDEX_TYPE,
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
     body: message.payload
   })
@@ -41,8 +41,8 @@ create.schema = {
  */
 function * update (message) {
   yield client.update({
-    index: config.ELASTICSEARCH_INDEX,
-    type: config.ELASTICSEARCH_INDEX_TYPE,
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
     body: { doc: message.payload }
   })
@@ -56,8 +56,8 @@ update.schema = create.schema
  */
 function * remove (message) {
   yield client.delete({
-    index: config.ELASTICSEARCH_INDEX,
-    type: config.ELASTICSEARCH_INDEX_TYPE,
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id
   })
 }

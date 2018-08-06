@@ -1,10 +1,9 @@
 /**
- * The configuration file.
+ * The default configuration file.
  */
-const AWS = require('aws-sdk')
-const httpAWSes = require('http-aws-es')
 
 module.exports = {
+  DISABLE_LOGGING: process.env.DISABLE_LOGGING || false, // If true, logging will be disabled
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
 
   KAFKA_URL: process.env.KAFKA_URL || 'localhost:9092',
@@ -17,18 +16,11 @@ module.exports = {
   UPDATE_DATA_TOPIC: process.env.UPDATE_DATA_TOPIC || 'submission.notification.update',
   DELETE_DATA_TOPIC: process.env.DELETE_DATA_TOPIC || 'submission.notification.delete',
 
-  // see https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/configuration.html
-  // for full config details, for SSL connection, see the ssl field details in above page
-  ELASTICSEARCH_CONFIG: {
-    apiVersion: process.env.ES_API_VERSION || '6.3',
-    host: process.env.ELASTICSEARCH_HOST || 'localhost:9200',
-    connectionClass: httpAWSes,
-    amazonES: {
-      region: process.env.AWS_REGION || 'us-east-1',
-      credentials: new AWS.EnvironmentCredentials('AWS')
-    }
-  },
-
-  ELASTICSEARCH_INDEX: process.env.ELASTICSEARCH_INDEX || 'submission-index',
-  ELASTICSEARCH_INDEX_TYPE: process.env.ELASTICSEARCH_INDEX_TYPE || 'submission'
+  esConfig: {
+    HOST: process.env.ES_HOST,
+    AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES
+    API_VERSION: process.env.ES_API_VERSION || '6.3',
+    ES_INDEX: process.env.ES_INDEX || 'submission-test',
+    ES_TYPE: process.env.ES_TYPE || '_doc' // ES 6.x accepts only 1 Type per index and it's mandatory to define it
+  }
 }

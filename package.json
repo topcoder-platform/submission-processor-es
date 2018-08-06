@@ -5,17 +5,23 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "lint": "standard --env mocha",
-    "lint-fix": "standard --env mocha --fix",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
     "init-es": "node src/init-es.js",
-    "view-data": "node test/view-data.js",
-    "test": "mocha test/*.test.js"
+    "view-data": "node test/common/view-data.js",
+    "test": "mocha test/unit/*.test.js --require test/unit/prepare.js --exit",
+    "e2e": "mocha test/e2e/*.test.js --exit",
+    "cov": "nyc --reporter=html --reporter=text mocha test/unit/*.test.js --require test/unit/prepare.js --exit",
+    "cov-e2e": "nyc --reporter=html --reporter=text mocha test/e2e/*.test.js --exit"
   },
   "author": "TCSCODER",
   "license": "none",
   "devDependencies": {
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
+    "mocha-prepare": "^0.1.0",
+    "nock": "^9.4.4",
+    "nyc": "^12.0.2",
     "standard": "^11.0.1",
     "uuid": "^3.3.2"
   },
@@ -35,5 +41,10 @@
   },
   "engines": {
     "node": "8.x"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
   }
 }
