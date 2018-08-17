@@ -1,6 +1,7 @@
 version: '3'
 services:
   submission-processor-es:
+    image: submission-processor-es:latest
     build:
       context: ../
       dockerfile: docker/Dockerfile
