@@ -190,3 +190,39 @@ info: The data is not found.
   `{ "topic": "submission.notification.create", "originator": "submission-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "resource": "reviewType", "id": "3333", "name": "some review type", "isActive": true } }`
 - reviewSummation:
   `{ "topic": "submission.notification.create", "originator": "submission-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "resource": "reviewSummation", "id": "4444", "submissionId": "asdfasdf", "aggregateScore": 98, "scoreCardId": "abbccaaa", "isPassing": true, "created": "2018-01-02T00:00:00", "updated": "2018-02-03T00:00:00", "createdBy": "admin", "updatedBy": "user" } }`
+
+
+### Verification for combining review and reviewSummation with Submission 
+
+- From the `submissions-api` repository, Run the command `npm run create-index` to create index with specified data types
+
+- Run the command `npm run init-es` to load test data into ES
+
+- Now from the Kafka console producer, Write the below messages into topic `submission.notification.create`
+
+```
+{ "topic":"submission.notification.create", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0502", "score": 92.0, "typeId": "c56a4180-65aa-42ec-a945-5fd21dec0501", "reviewerId": "c23a4180-65aa-42ec-a945-5fd21dec0503", "scoreCardId": "b25a4180-65aa-42ec-a945-5fd21dec0503", "submissionId": "a12a4180-65aa-42ec-a945-5fd21dec0501", "created": "2018-05-20T07:00:30.123Z", "updated": "2018-06-01T07:36:28.178Z", "createdBy": "admin", "updatedBy": "admin" } }
+
+
+{ "topic":"submission.notification.create", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0503", "score": 95.0, "typeId": "c56a4180-65aa-42ec-a945-5fd21dec0501", "reviewerId": "c23a4180-65aa-42ec-a945-5fd21dec0504", "scoreCardId": "b25a4180-65aa-42ec-a945-5fd21dec0503", "submissionId": "a12a4180-65aa-42ec-a945-5fd21dec0501", "created": "2018-05-20T07:00:30.123Z", "updated": "2018-06-01T07:36:28.178Z", "createdBy": "admin", "updatedBy": "admin" } }
+```
+
+- This will create two reviews as well as attach the reviews with a submission
+
+- To look at the updated submission in ES, Run the below command
+
+```
+npm run view-data a12a4180-65aa-42ec-a945-5fd21dec0501
+```
+
+- To check the update of reviews, Write the below message into topic `submission.notification.update` and check data using above `view-data` command
+
+```
+{ "topic":"submission.notification.update", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0502", "score": 93.2, "updatedBy": "test" } }
+```
+
+- To check the deletion of reviews, Write the below message into topic `submission.notification.delete` and check data using above `view-data` command
+
+```
+{ "topic":"submission.notification.delete", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0503" } }
+```
