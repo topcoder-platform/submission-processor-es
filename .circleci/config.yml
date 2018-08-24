@@ -47,7 +47,7 @@ jobs:
             sudo chmod +x /usr/local/bin/ecs-cli
       - run:
           name: Installation of build dependencies.
-          command: ./build.sh DEV
+          command: ./build.sh PROD
       - deploy:
           command: |
             git clone --branch master https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
