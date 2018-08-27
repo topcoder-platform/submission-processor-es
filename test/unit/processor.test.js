@@ -4,81 +4,17 @@
 
 const _ = require('lodash')
 const expect = require('chai').expect
-const ProcessorService = require('../src/services/ProcessorService')
+const ProcessorService = require('../../src/services/ProcessorService')
 const uuid = require('uuid/v4')
 const co = require('co')
-const testHelper = require('./testHelper')
+const testHelper = require('../common/testHelper')
+const { submissionMessage, reviewMessage,
+  reviewTypeMessage, reviewSummationMessage,
+  updatedSubmission, updatedReview,
+  updatedReviewType, updatedReviewSummation } = require('../common/testData')
 
 describe('TC Submission Processor Tests', () => {
   // test data
-  const submissionMessage = {
-    topic: 'submission.notification.create',
-    originator: 'submission-api',
-    timestamp: '2018-02-03T00:00:00',
-    'mime-type': 'application/json',
-    payload: {
-      resource: 'submission',
-      id: uuid(),
-      type: 'ContestSubmission',
-      url: 'http://test.com/some/path',
-      memberId: uuid(),
-      challengeId: uuid(),
-      created: '2018-01-01T00:00:00',
-      updated: '2018-01-02T00:00:00',
-      createdBy: 'admin',
-      updatedBy: 'user'
-    }
-  }
-  const reviewMessage = {
-    topic: 'submission.notification.create',
-    originator: 'submission-api',
-    timestamp: '2018-02-03T00:00:00',
-    'mime-type': 'application/json',
-    payload: {
-      resource: 'review',
-      id: uuid(),
-      score: 98,
-      typeId: uuid(),
-      reviewerId: uuid(),
-      scoreCardId: uuid(),
-      submissionId: uuid(),
-      created: '2018-01-01T00:00:00',
-      updated: '2018-01-02T00:00:00',
-      createdBy: 'admin',
-      updatedBy: 'user'
-    }
-  }
-  const reviewTypeMessage = {
-    topic: 'submission.notification.create',
-    originator: 'submission-api',
-    timestamp: '2018-02-03T00:00:00',
-    'mime-type': 'application/json',
-    payload: {
-      resource: 'reviewType',
-      id: uuid(),
-      name: 'Iterative Review',
-      isActive: true
-    }
-  }
-  const reviewSummationMessage = {
-    topic: 'submission.notification.create',
-    originator: 'submission-api',
-    timestamp: '2018-02-03T00:00:00',
-    'mime-type': 'application/json',
-    payload: {
-      resource: 'reviewSummation',
-      id: uuid(),
-      submissionId: uuid(),
-      aggregateScore: 88,
-      scoreCardId: uuid(),
-      isPassing: true,
-      created: '2018-01-01T00:00:00',
-      updated: '2018-01-02T00:00:00',
-      createdBy: 'admin',
-      updatedBy: 'user'
-    }
-  }
-
   it('create submission message', (done) => {
     co(function * () {
       yield ProcessorService.create(submissionMessage)
@@ -87,12 +23,14 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create submission message - already exists', (done) => {
+    const message = _.cloneDeep(submissionMessage)
+    message.payload.id = uuid()
     co(function * () {
       try {
-        yield ProcessorService.create(submissionMessage)
+        yield ProcessorService.create(message)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(409)
@@ -102,26 +40,20 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update submission message', (done) => {
-    const message = _.cloneDeep(submissionMessage)
-    message.topic = 'submission.notification.update'
-    message.payload.url = 'http://test.com/other'
-    message.payload.memberId = uuid()
-    message.payload.updatedBy = 'tester'
     co(function * () {
-      yield ProcessorService.update(message)
-      const data = yield testHelper.getESData(submissionMessage.payload.id)
-      testHelper.expectObject(data, message.payload)
+      yield ProcessorService.update(updatedSubmission)
+      const data = yield testHelper.getESData(updatedSubmission.payload.id)
+      testHelper.expectObject(data, updatedSubmission.payload)
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update submission message - not found', (done) => {
-    const message = _.cloneDeep(submissionMessage)
-    message.topic = 'submission.notification.update'
+    const message = _.cloneDeep(updatedSubmission)
     message.payload.id = uuid()
     co(function * () {
       try {
@@ -135,15 +67,16 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete submission message', (done) => {
     const message = _.cloneDeep(submissionMessage)
     message.topic = 'submission.notification.delete'
+    message.payload.id = uuid()
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(submissionMessage.payload.id)
+        yield testHelper.getESData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -153,7 +86,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete submission message - not found', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -170,7 +103,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create review message', (done) => {
     co(function * () {
@@ -180,12 +113,14 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create review message - already exists', (done) => {
+    const message = _.cloneDeep(reviewMessage)
+    message.payload.id = uuid()
     co(function * () {
       try {
-        yield ProcessorService.create(reviewMessage)
+        yield ProcessorService.create(message)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(409)
@@ -195,22 +130,17 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update review message', (done) => {
-    const message = _.cloneDeep(reviewMessage)
-    message.topic = 'submission.notification.update'
-    message.payload.score = 80
-    message.payload.typeId = uuid()
-    message.payload.updatedBy = 'tester'
     co(function * () {
-      yield ProcessorService.update(message)
-      const data = yield testHelper.getESData(reviewMessage.payload.id)
-      testHelper.expectObject(data, message.payload)
+      yield ProcessorService.update(updatedReview)
+      const data = yield testHelper.getESData(updatedReview.payload.id)
+      testHelper.expectObject(data, updatedReview.payload)
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update review message - not found', (done) => {
     const message = _.cloneDeep(reviewMessage)
@@ -228,15 +158,16 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete review message', (done) => {
     const message = _.cloneDeep(reviewMessage)
     message.topic = 'submission.notification.delete'
+    message.payload.id = uuid()
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(reviewMessage.payload.id)
+        yield testHelper.getESData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -246,7 +177,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete review message - not found', (done) => {
     const message = _.cloneDeep(reviewMessage)
@@ -263,7 +194,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create review type message', (done) => {
     co(function * () {
@@ -273,12 +204,14 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create review type message - already exists', (done) => {
+    const message = _.cloneDeep(reviewTypeMessage)
+    message.payload.id = uuid()
     co(function * () {
       try {
-        yield ProcessorService.create(reviewTypeMessage)
+        yield ProcessorService.create(message)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(409)
@@ -288,21 +221,17 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update review type message', (done) => {
-    const message = _.cloneDeep(reviewTypeMessage)
-    message.topic = 'submission.notification.update'
-    message.payload.name = 'new name'
-    message.payload.isActive = false
     co(function * () {
-      yield ProcessorService.update(message)
-      const data = yield testHelper.getESData(reviewTypeMessage.payload.id)
-      testHelper.expectObject(data, message.payload)
+      yield ProcessorService.update(updatedReviewType)
+      const data = yield testHelper.getESData(updatedReviewType.payload.id)
+      testHelper.expectObject(data, updatedReviewType.payload)
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update review type message - not found', (done) => {
     const message = _.cloneDeep(reviewTypeMessage)
@@ -320,15 +249,16 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete review type message', (done) => {
     const message = _.cloneDeep(reviewTypeMessage)
     message.topic = 'submission.notification.delete'
+    message.payload.id = uuid()
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(reviewTypeMessage.payload.id)
+        yield testHelper.getESData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -338,7 +268,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete review type message - not found', (done) => {
     const message = _.cloneDeep(reviewTypeMessage)
@@ -355,7 +285,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create review summation message', (done) => {
     co(function * () {
@@ -365,12 +295,14 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create review summation message - already exists', (done) => {
+    const message = _.cloneDeep(reviewSummationMessage)
+    message.payload.id = uuid()
     co(function * () {
       try {
-        yield ProcessorService.create(reviewSummationMessage)
+        yield ProcessorService.create(message)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(409)
@@ -380,24 +312,17 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update review summation message', (done) => {
-    const message = _.cloneDeep(reviewSummationMessage)
-    message.topic = 'submission.notification.update'
-    message.payload.submissionId = uuid()
-    message.payload.aggregateScore = 66
-    message.payload.scoreCardId = uuid()
-    message.payload.isPassing = false
-    message.payload.updatedBy = 'user'
     co(function * () {
-      yield ProcessorService.update(message)
-      const data = yield testHelper.getESData(reviewSummationMessage.payload.id)
-      testHelper.expectObject(data, message.payload)
+      yield ProcessorService.update(updatedReviewSummation)
+      const data = yield testHelper.getESData(updatedReviewSummation.payload.id)
+      testHelper.expectObject(data, updatedReviewSummation.payload)
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update review summation message - not found', (done) => {
     const message = _.cloneDeep(reviewSummationMessage)
@@ -415,15 +340,16 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete review summation message', (done) => {
     const message = _.cloneDeep(reviewSummationMessage)
     message.topic = 'submission.notification.delete'
+    message.payload.id = uuid()
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(reviewSummationMessage.payload.id)
+        yield testHelper.getESData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -433,7 +359,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete review summation message - not found', (done) => {
     const message = _.cloneDeep(reviewSummationMessage)
@@ -450,7 +376,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create message - invalid parameters, missing originator', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -467,7 +393,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create message - invalid parameters, wrong mime-type', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -484,7 +410,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create message - invalid parameters, missing payload id', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -501,7 +427,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('create message - invalid parameters, invalid payload resource', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -518,7 +444,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update message - invalid parameters, missing payload', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -535,7 +461,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update message - invalid parameters, missing payload resource', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -552,7 +478,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('update message - invalid parameters, invalid timestamp', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -569,7 +495,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete message - invalid parameters, invalid payload id', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -586,7 +512,7 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 
   it('delete message - invalid parameters, invalid topic', (done) => {
     const message = _.cloneDeep(submissionMessage)
@@ -603,5 +529,5 @@ describe('TC Submission Processor Tests', () => {
     })
       .then(() => done())
       .catch(done)
-  })
+  }).timeout(10000)
 })

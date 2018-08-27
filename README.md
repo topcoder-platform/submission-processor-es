@@ -9,12 +9,6 @@ This processor only writes to ElasticSearch. It deals with the create, update an
 - ElasticSearch
 - Docker, Docker Compose
 
-## Notes
-
-In Elasticsearch v6+, it can support one type per index, see
-https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
-so for all 4 types, same configured index type is used, types are distinguished by the 'resource' attribute of indexed data.
-
 ## Configuration
 
 Configuration for the notification server is at `config/default.js`.
@@ -31,11 +25,10 @@ The following parameters can be set in config files or in env variables:
 - CREATE_DATA_TOPIC: create data Kafka topic, default value is 'submission.notification.create'
 - UPDATE_DATA_TOPIC: update data Kafka topic, default value is 'submission.notification.update'
 - DELETE_DATA_TOPIC: delete data Kafka topic, default value is 'submission.notification.delete'
-- ELASTICSEARCH_CONFIG: the config to create Elasticsearch client, see
-    https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/configuration.html
-    for full details, SSL connection can be configured in ssl config field
-- ELASTICSEARCH_INDEX: the Elasticsearch index to store Kafka messages data, default value is 'submission-index'
-- ELASTICSEARCH_INDEX_TYPE: the Elasticsearch index type name, default value is 'submission'
+
+Refer to `esConfig` variable in `config/default.js` for ES related configuration.
+
+Also note that there is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
 ## Local Kafka setup
 
@@ -64,10 +57,6 @@ The following parameters can be set in config files or in env variables:
   `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic submission.notification.create --from-beginning`
 - writing/reading messages to/from other topics are similar
 
-## ElasticSearch setup
-
-- go to docker folder, run `docker-compose up`
-
 ## Local deployment
 
 - install dependencies `npm i`
@@ -76,6 +65,63 @@ The following parameters can be set in config files or in env variables:
 - or to re-create the index: `npm run init-es force`
 - run tests `npm run test`
 - start processor app `npm start`
+
+## Local Deployment with Docker
+
+To run the Submission ES Processor using docker, follow the below steps
+
+1. Navigate to the directory `docker`
+
+2. Rename the file `sample.api.env` to `api.env`
+
+3. Set the required AWS credentials in the file `api.env`
+
+4. Once that is done, run the following command
+
+```
+docker-compose up
+```
+
+5. When you are running the application for the first time, It will take some time initially to download the image and install the dependencies
+
+## Unit tests and Integration tests
+
+Integration tests use different index `submission-test` which is not same as the usual index `submission`.
+
+Please ensure to create the index `submission-test` or the index specified in the environment variable `ES_INDEX_TEST` before running the Integration tests. You could re-use the existing scripts to create index but you would need to set the below environment variable
+
+```
+export ES_INDEX=submission-test
+```
+
+#### Running unit tests and coverage
+
+To run unit tests alone
+
+```
+npm run test
+```
+
+To run unit tests with coverage report
+
+```
+npm run cov
+```
+
+#### Running integration tests and coverage
+
+To run integration tests alone
+
+```
+npm run e2e
+```
+
+To run integration tests with coverage report
+
+```
+npm run cov-e2e
+```
+
 
 ## Verification
 
@@ -146,3 +192,39 @@ info: The data is not found.
   `{ "topic": "submission.notification.create", "originator": "submission-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "resource": "reviewType", "id": "3333", "name": "some review type", "isActive": true } }`
 - reviewSummation:
   `{ "topic": "submission.notification.create", "originator": "submission-api", "timestamp": "2018-02-16T00:00:00", "mime-type": "application/json", "payload": { "resource": "reviewSummation", "id": "4444", "submissionId": "asdfasdf", "aggregateScore": 98, "scoreCardId": "abbccaaa", "isPassing": true, "created": "2018-01-02T00:00:00", "updated": "2018-02-03T00:00:00", "createdBy": "admin", "updatedBy": "user" } }`
+
+
+### Verification for combining review and reviewSummation with Submission 
+
+- From the `submissions-api` repository, Run the command `npm run create-index` to create index with specified data types
+
+- Run the command `npm run init-es` to load test data into ES
+
+- Now from the Kafka console producer, Write the below messages into topic `submission.notification.create`
+
+```
+{ "topic":"submission.notification.create", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0502", "score": 92.0, "typeId": "c56a4180-65aa-42ec-a945-5fd21dec0501", "reviewerId": "c23a4180-65aa-42ec-a945-5fd21dec0503", "scoreCardId": "b25a4180-65aa-42ec-a945-5fd21dec0503", "submissionId": "a12a4180-65aa-42ec-a945-5fd21dec0501", "created": "2018-05-20T07:00:30.123Z", "updated": "2018-06-01T07:36:28.178Z", "createdBy": "admin", "updatedBy": "admin" } }
+
+
+{ "topic":"submission.notification.create", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0503", "score": 95.0, "typeId": "c56a4180-65aa-42ec-a945-5fd21dec0501", "reviewerId": "c23a4180-65aa-42ec-a945-5fd21dec0504", "scoreCardId": "b25a4180-65aa-42ec-a945-5fd21dec0503", "submissionId": "a12a4180-65aa-42ec-a945-5fd21dec0501", "created": "2018-05-20T07:00:30.123Z", "updated": "2018-06-01T07:36:28.178Z", "createdBy": "admin", "updatedBy": "admin" } }
+```
+
+- This will create two reviews as well as attach the reviews with a submission
+
+- To look at the updated submission in ES, Run the below command
+
+```
+npm run view-data a12a4180-65aa-42ec-a945-5fd21dec0501
+```
+
+- To check the update of reviews, Write the below message into topic `submission.notification.update` and check data using above `view-data` command
+
+```
+{ "topic":"submission.notification.update", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0502", "score": 93.2, "updatedBy": "test" } }
+```
+
+- To check the deletion of reviews, Write the below message into topic `submission.notification.delete` and check data using above `view-data` command
+
+```
+{ "topic":"submission.notification.delete", "originator":"submission-api", "timestamp":"2018-08-06T15:46:05.575Z", "mime-type":"application/json", "payload":{ "resource":"review", "id": "d34d4180-65aa-42ec-a945-5fd21dec0503" } }
+```
