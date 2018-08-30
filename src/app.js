@@ -12,7 +12,7 @@ const ProcessorService = require('./services/ProcessorService')
 const healthcheck = require('topcoder-healthcheck-dropin')
 
 // create consumer
-const options = { connectionString: config.KAFKA_URL }
+const options = { connectionString: config.KAFKA_URL, handlerConcurrency: 1 }
 if (config.KAFKA_CLIENT_CERT && config.KAFKA_CLIENT_CERT_KEY) {
   options.ssl = { cert: config.KAFKA_CLIENT_CERT, key: config.KAFKA_CLIENT_CERT_KEY }
 }
