@@ -13,6 +13,7 @@ Configuration for the notification server is at `config/default.js`.
 The following parameters can be set in config files or in env variables:
 
 - LOG_LEVEL: the log level; default value: 'debug'
+- KAFKA_GROUP_ID: group id of the consumer; default value: 'submission-processor-es-group'
 - KAFKA_URL: comma separated Kafka hosts; default value: 'localhost:9092'
 - KAFKA_CLIENT_CERT: Kafka connection certificate, optional; default value is undefined;
     if not provided, then SSL connection is not used, direct insecure connection is used;
