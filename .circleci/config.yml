@@ -24,9 +24,17 @@ jobs:
           command: ./build.sh DEV
       - deploy:
           command: |
-            git clone --branch v1.1 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
+            
+            git clone --branch devsts https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
             cp ./../buildscript/master_deploy.sh .
-            ./master_deploy.sh -d ECS -e DEV -t $CIRCLE_BUILD_NUM -s submission-processor-es
+            cp ./../buildscript/buildenv.sh .
+            cp ./../buildscript/awsconfiguration.sh .
+            ./awsconfiguration.sh DEV
+            source awsenvconf 
+            ./buildenv.sh -e DEV -b submission-processor-es_deployvar
+            source buildenvvar
+            ./master_deploy.sh -d ECS -e DEV -t latest -s submission-processor-es_appvar -i submission-processor-es
+            
     
   "build-prod":
     docker:
@@ -61,6 +69,7 @@ workflows:
     jobs:
       # Development builds are executed on "develop" branch only.
       - "build-dev":
+          context : org-global
           filters:
             branches:
               only: develop
