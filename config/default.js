@@ -25,16 +25,16 @@ module.exports = {
   },
 
   tracing: {
-    dataDogEnabled: true,
-    lightStepEnabled: true,
+    dataDogEnabled: process.env.DATADOG_ENABLED || true,
+    lightStepEnabled: process.env.LIGHTSTEP_ENABLED || true,
 
     dataDog: {
-      service: 'submission-processor-es'
+      service: process.env.DATADOG_SERVICE_NAME || 'submission-processor-es'
     },
 
     lightStep: {
-      access_token: '',
-      component_name: ''
+      access_token: process.env.LIGHTSTEP_ACCESS_TOKEN || '',
+      component_name: process.env.LIGHTSTEP_COMPONENT_NAME || ''
     }
   }
 }
