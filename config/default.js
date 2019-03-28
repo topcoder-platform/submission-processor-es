@@ -22,5 +22,19 @@ module.exports = {
     API_VERSION: process.env.ES_API_VERSION || '6.3',
     ES_INDEX: process.env.ES_INDEX || 'submission',
     ES_TYPE: process.env.ES_TYPE || '_doc' // ES 6.x accepts only 1 Type per index and it's mandatory to define it
+  },
+
+  tracing: {
+    dataDogEnabled: true,
+    lightStepEnabled: true,
+
+    dataDog: {
+      service: 'submission-processor-es'
+    },
+
+    lightStep: {
+      access_token: '',
+      component_name: ''
+    }
   }
 }
