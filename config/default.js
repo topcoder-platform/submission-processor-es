@@ -29,7 +29,8 @@ module.exports = {
     lightStepEnabled: process.env.LIGHTSTEP_ENABLED || true,
 
     dataDog: {
-      service: process.env.DATADOG_SERVICE_NAME || 'submission-processor-es'
+      service: process.env.DATADOG_SERVICE_NAME || 'submission-processor-es',
+      hostname: process.env.DD_TRACE_AGENT_HOSTNAME
     },
 
     lightStep: {
