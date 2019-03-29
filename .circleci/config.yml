@@ -7,7 +7,7 @@ install_dependency: &install_dependency
           command: |
             apk update
             apk add --no-cache bash
-            apk add --no-cache jq py-pip sudo curl
+            apk add --no-cache jq py-pip sudo curl gcc python-dev musl-dev libffi-dev make openssl-dev
             apk upgrade
             pip install --upgrade pip
             sudo pip install awscli --upgrade
