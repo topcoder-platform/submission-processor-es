@@ -27,6 +27,7 @@ module.exports = {
   tracing: {
     dataDogEnabled: process.env.DATADOG_ENABLED || true,
     lightStepEnabled: process.env.LIGHTSTEP_ENABLED || true,
+    signalFXEnabled: process.env.SIGNALFX_ENABLED || true,
 
     dataDog: {
       service: process.env.DATADOG_SERVICE_NAME || 'submission-processor-es',
@@ -36,6 +37,11 @@ module.exports = {
     lightStep: {
       access_token: process.env.LIGHTSTEP_ACCESS_TOKEN || '',
       component_name: process.env.LIGHTSTEP_COMPONENT_NAME || ''
+    },
+
+    signalFX: {
+      accessToken: process.env.SIGNALFX_ACCESS_TOKEN || '',
+      url: process.env.SIGNALFX_TRACE_AGENT_HOSTNAME || ''
     }
   }
 }

@@ -65,6 +65,12 @@ function initTracing (config) {
 
     tracers['lightstep'] = new ls.Tracer(Object.assign(options, globalOptions))
   }
+
+  if (config.has('signalFXEnabled') && config.get('signalFXEnabled') === true) {
+    const options = config.has('signalFX') ? config.get('signalFX') : {}
+    tracers['signalFX'] = require('signalfx-tracing')
+      .init(Object.assign(options, globalOptions))
+  }
 }
 
 /**
