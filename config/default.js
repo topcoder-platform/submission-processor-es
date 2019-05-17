@@ -41,7 +41,7 @@ module.exports = {
 
     signalFX: {
       accessToken: process.env.SIGNALFX_ACCESS_TOKEN || '',
-      url: process.env.SIGNALFX_TRACE_AGENT_HOSTNAME || ''
+      url: `https://${process.env.SIGNALFX_TRACE_AGENT_HOSTNAME}:9080/v1/trace` || ''
     }
   }
 }
