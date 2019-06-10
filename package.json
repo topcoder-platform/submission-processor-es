@@ -31,7 +31,7 @@
     "co": "^4.6.0",
     "config": "^3.1.0",
     "dd-trace": "^0.11.2",
-    "elasticsearch": "^16.1.1",
+    "elasticsearch": "^15.1.1",
     "get-parameter-names": "^0.3.0",
     "http-aws-es": "^6.0.0",
     "joi": "^14.3.1",
