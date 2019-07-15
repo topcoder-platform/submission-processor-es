@@ -31,7 +31,7 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (
   span.setTag('message_bus.destination', topic)
   span.setTag('kafka.partition', partition)
   span.setTag('kafka.offset', m.offset)
-  span.setTag('kind', 'consumer')
+  span.setTag('span.kind', 'consumer')
 
   const message = m.message.value.toString('utf8')
   logger.info(`Handle Kafka event message; Topic: ${topic}; Partition: ${partition}; Offset: ${
