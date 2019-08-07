@@ -53,8 +53,8 @@ function * create (message) {
     const submission = yield getESData(message.payload.submissionId)
     let reviewSummationArr = []
     reviewSummationArr.push(_.omit(message.payload, ['resource']))
-    if (submission.reviewSummationArr) {
-      reviewSummationArr = reviewSummationArr.concat(submission.review)
+    if (submission.reviewSummation) {
+      reviewSummationArr = reviewSummationArr.concat(submission.reviewSummation)
     }
     yield client.update({
       index: config.get('esConfig.ES_INDEX'),
