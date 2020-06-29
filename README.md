@@ -26,6 +26,8 @@ The following parameters can be set in config files or in env variables:
 
 Refer to `esConfig` variable in `config/default.js` for ES related configuration.
 
+**NOTE** Kindly refer to Issue 179 of submission api. We had to create a new index, copy the mapping over of the old index, and then the data. The new index is defined under `ES_INDEX_V2` environment variable. This new index is now used for all operations
+
 Also note that there is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
 ## Local Kafka setup

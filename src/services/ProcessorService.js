@@ -17,7 +17,7 @@ const client = helper.getESClient()
  */
 function * getESData (id) {
   return yield client.getSource({
-    index: config.get('esConfig.ES_INDEX'),
+    index: config.get('esConfig.ES_INDEX_V2'),
     type: config.get('esConfig.ES_TYPE'),
     id
   })
@@ -29,7 +29,7 @@ function * getESData (id) {
  */
 function * create (message) {
   yield client.create({
-    index: config.get('esConfig.ES_INDEX'),
+    index: config.get('esConfig.ES_INDEX_V2'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
     body: message.payload
@@ -44,7 +44,7 @@ function * create (message) {
       reviewArr = reviewArr.concat(submission.review)
     }
     yield client.update({
-      index: config.get('esConfig.ES_INDEX'),
+      index: config.get('esConfig.ES_INDEX_V2'),
       type: config.get('esConfig.ES_TYPE'),
       id: message.payload.submissionId,
       body: { doc: {review: reviewArr} }
@@ -57,7 +57,7 @@ function * create (message) {
       reviewSummationArr = reviewSummationArr.concat(submission.reviewSummation)
     }
     yield client.update({
-      index: config.get('esConfig.ES_INDEX'),
+      index: config.get('esConfig.ES_INDEX_V2'),
       type: config.get('esConfig.ES_TYPE'),
       id: message.payload.submissionId,
       body: { doc: {reviewSummation: reviewSummationArr} }
@@ -84,7 +84,7 @@ create.schema = {
  */
 function * update (message) {
   yield client.update({
-    index: config.get('esConfig.ES_INDEX'),
+    index: config.get('esConfig.ES_INDEX_V2'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
     body: { doc: message.payload }
@@ -98,7 +98,7 @@ function * update (message) {
     _.remove(submission.review, {id: message.payload.id})
     submission.review.push(reviewToBeUpdated)
     yield client.update({
-      index: config.get('esConfig.ES_INDEX'),
+      index: config.get('esConfig.ES_INDEX_V2'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
       body: { doc: {review: submission.review} }
@@ -111,7 +111,7 @@ function * update (message) {
     _.remove(submission.reviewSummation, {id: message.payload.id})
     submission.reviewSummation.push(reviewSummationToBeUpdated)
     yield client.update({
-      index: config.get('esConfig.ES_INDEX'),
+      index: config.get('esConfig.ES_INDEX_V2'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
       body: { doc: {reviewSummation: submission.reviewSummation} }
@@ -132,7 +132,7 @@ function * remove (message) {
     const submission = yield getESData(review.submissionId)
     _.remove(submission.review, {id: message.payload.id})
     yield client.update({
-      index: config.get('esConfig.ES_INDEX'),
+      index: config.get('esConfig.ES_INDEX_V2'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
       body: { doc: {review: submission.review} }
@@ -142,7 +142,7 @@ function * remove (message) {
     const submission = yield getESData(reviewSummation.submissionId)
     _.remove(submission.reviewSummation, {id: message.payload.id})
     yield client.update({
-      index: config.get('esConfig.ES_INDEX'),
+      index: config.get('esConfig.ES_INDEX_V2'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
       body: { doc: {reviewSummation: submission.reviewSummation} }
@@ -150,7 +150,7 @@ function * remove (message) {
   }
 
   yield client.delete({
-    index: config.get('esConfig.ES_INDEX'),
+    index: config.get('esConfig.ES_INDEX_V2'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id
   })
