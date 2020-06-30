@@ -28,6 +28,7 @@ function * getESData (id) {
  * @param {Object} message the message
  */
 function * create (message) {
+  logger.debug(`Creating data in index ${config.get('esConfig.ES_INDEX_V2')}`)
   yield client.create({
     index: config.get('esConfig.ES_INDEX_V2'),
     type: config.get('esConfig.ES_TYPE'),
