@@ -28,6 +28,11 @@ function * getESData (id) {
  * @param {Object} message the message
  */
 function * create (message) {
+  if (message.payload.resource === 'submission') {
+    message.payload.challengeId = message.payload.v5ChallengeId
+    delete message.payload.v5ChallengeId
+  }
+
   yield client.create({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
@@ -53,8 +58,8 @@ function * create (message) {
     const submission = yield getESData(message.payload.submissionId)
     let reviewSummationArr = []
     reviewSummationArr.push(_.omit(message.payload, ['resource']))
-    if (submission.reviewSummationArr) {
-      reviewSummationArr = reviewSummationArr.concat(submission.review)
+    if (submission.reviewSummation) {
+      reviewSummationArr = reviewSummationArr.concat(submission.reviewSummation)
     }
     yield client.update({
       index: config.get('esConfig.ES_INDEX'),
@@ -83,6 +88,13 @@ create.schema = {
  * @param {Object} message the message
  */
 function * update (message) {
+  if (message.payload.resource === 'submission') {
+    const legacyChallengeId = message.payload.challengeId
+    message.payload.challengeId = message.payload.v5ChallengeId
+    message.payload.legacyChallengeId = legacyChallengeId
+    delete message.payload.v5ChallengeId
+  }
+
   yield client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
