@@ -99,6 +99,7 @@ function * update (message) {
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
+    refresh: 'wait_for',
     body: { doc: message.payload }
   })
 
