@@ -29,8 +29,10 @@ function * getESData (id) {
  */
 function * create (message) {
   if (message.payload.resource === 'submission') {
-    message.payload.challengeId = message.payload.v5ChallengeId
-    delete message.payload.v5ChallengeId
+    if (message.payload.v5ChallengeId) {
+      message.payload.challengeId = message.payload.v5ChallengeId
+      delete message.payload.v5ChallengeId
+    }
   }
 
   yield client.create({
@@ -89,10 +91,12 @@ create.schema = {
  */
 function * update (message) {
   if (message.payload.resource === 'submission') {
-    const legacyChallengeId = message.payload.challengeId
-    message.payload.challengeId = message.payload.v5ChallengeId
-    message.payload.legacyChallengeId = legacyChallengeId
-    delete message.payload.v5ChallengeId
+    if (message.payload.v5ChallengeId) {
+      const legacyChallengeId = message.payload.challengeId
+      message.payload.challengeId = message.payload.v5ChallengeId
+      message.payload.legacyChallengeId = legacyChallengeId
+      delete message.payload.v5ChallengeId
+    }
   }
 
   yield client.update({
