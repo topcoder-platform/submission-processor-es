@@ -33,14 +33,14 @@ function * create (message) {
       message.payload.challengeId = message.payload.v5ChallengeId
       delete message.payload.v5ChallengeId
     }
-
-    yield client.create({
-      index: config.get('esConfig.ES_INDEX'),
-      type: config.get('esConfig.ES_TYPE'),
-      id: message.payload.id,
-      body: message.payload
-    })
   }
+
+  yield client.create({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id: message.payload.id,
+    body: message.payload
+  })
 
   // Add review / reviewSummation to submission
   if (message.payload.resource === 'review') {
