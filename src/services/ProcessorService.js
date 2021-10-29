@@ -91,7 +91,12 @@ function * update (message) {
   if (message.payload.resource === 'submission') {
     const legacyChallengeId = message.payload.challengeId
     message.payload.challengeId = message.payload.v5ChallengeId
-    message.payload.legacyChallengeId = legacyChallengeId
+    // Pure v5 challenges wont have legacy challenge id
+    // We compare to see if the two attributes are the same which is the case
+    // for pure v5 challenges
+    if (message.payload.challengeId !== message.payload.v5ChallengeId) {
+      message.payload.legacyChallengeId = legacyChallengeId
+    }
     delete message.payload.v5ChallengeId
   }
 
