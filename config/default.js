@@ -16,6 +16,8 @@ module.exports = {
   UPDATE_DATA_TOPIC: process.env.UPDATE_DATA_TOPIC || 'submission.notification.update',
   DELETE_DATA_TOPIC: process.env.DELETE_DATA_TOPIC || 'submission.notification.delete',
 
+  RSYNC_DATA_TOPIC: process.env.RSYNC_DATA_TOPIC || 'submission.notification.rsync',
+
   esConfig: {
     HOST: process.env.ES_HOST,
     AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES

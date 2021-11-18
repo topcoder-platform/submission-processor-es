@@ -48,6 +48,9 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (
       case config.DELETE_DATA_TOPIC:
         yield ProcessorService.remove(messageJSON)
         break
+      case config.RSYNC_DATA_TOPIC:
+        yield ProcessorService.create(messageJSON)
+        break
       default:
         throw new Error(`Invalid topic: ${topic}`)
     }
@@ -76,7 +79,7 @@ consumer
   .then(() => {
     healthcheck.init([check])
 
-    const topics = [config.CREATE_DATA_TOPIC, config.UPDATE_DATA_TOPIC, config.DELETE_DATA_TOPIC]
+    const topics = [config.CREATE_DATA_TOPIC, config.UPDATE_DATA_TOPIC, config.DELETE_DATA_TOPIC, config.RSYNC_DATA_TOPIC]
     _.each(topics, (tp) => consumer.subscribe(tp, { time: Kafka.LATEST_OFFSET }, dataHandler))
   })
   .catch((err) => logger.error(err))
