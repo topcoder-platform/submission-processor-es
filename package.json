@@ -29,7 +29,7 @@
     "aws-sdk": "^2.286.2",
     "bluebird": "^3.5.1",
     "co": "^4.6.0",
-    "config": "^1.21.0",
+    "config": "^1.31.0",
     "elasticsearch": "^15.1.1",
     "get-parameter-names": "^0.3.0",
     "http-aws-es": "^6.0.0",
