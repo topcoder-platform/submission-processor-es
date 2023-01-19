@@ -100,13 +100,23 @@ function * update (message) {
     delete message.payload.v5ChallengeId
   }
 
-  yield client.update({
-    index: config.get('esConfig.ES_INDEX'),
-    type: config.get('esConfig.ES_TYPE'),
-    id: message.payload.id,
-    refresh: 'wait_for',
-    body: { doc: message.payload }
-  })
+  try {
+    yield client.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: message.payload.id,
+      refresh: 'wait_for',
+      body: { doc: message.payload }
+    }) 
+  } catch (err) {
+    console.log('Failed to index', message.payload.id, 'with error', err);
+    yield client.create({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: message.payload.id,
+      body: message.payload
+    })
+  }
 
   if (message.payload.resource === 'review') {
     const review = yield getESData(message.payload.id)
