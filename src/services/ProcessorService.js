@@ -116,6 +116,7 @@ function * update (message) {
     yield client.delete({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
+      refresh: 'wait_for',
       id: message.payload.id
     })
     console.log('deleted document', message.payload.id)
