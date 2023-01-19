@@ -101,16 +101,24 @@ function * update (message) {
   }
 
   try {
-    console.log('Indexing to ES', id, 'with payload', message.payload)
+    console.log('Indexing to ES', message.payload.id, 'with payload', message.payload)
     yield client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: message.payload.id,
       refresh: 'wait_for',
       body: { doc: message.payload }
-    }) 
+    })
+    console.log('update complete');
   } catch (err) {
     console.log('Failed to index', message.payload.id, 'with error', err);
+    // delete the document and re-create it
+    yield client.delete({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: message.payload.id
+    })
+    console.log('deleted document', message.payload.id)
     yield client.create({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
