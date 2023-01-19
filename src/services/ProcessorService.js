@@ -101,6 +101,7 @@ function * update (message) {
   }
 
   try {
+    console.log('Indexing to ES', id, 'with payload', message.payload)
     yield client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
@@ -116,6 +117,7 @@ function * update (message) {
       id: message.payload.id,
       body: message.payload
     })
+    console.log('Created new document', message.payload.id, 'with payload', message.payload)
   }
 
   if (message.payload.resource === 'review') {
