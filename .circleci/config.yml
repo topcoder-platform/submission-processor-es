@@ -43,7 +43,26 @@ jobs:
             source buildenvvar
             ./master_deploy.sh -d ECS -e DEV -t latest -s dev-global-appvar,submission-processor-es_appvar -i submission-processor-es
             
-    
+  # Build & Deploy against development backend
+  "build-qa":
+    <<: *defaults
+      
+    steps:
+      # Initialization.
+      - checkout
+      - setup_remote_docker
+      - run: *install_dependency
+      - run: *install_deploysuite
+      - run: *run_build
+
+      - deploy:
+          command: |
+            ./awsconfiguration.sh QA
+            source awsenvconf 
+            ./buildenv.sh -e QA -b qa-submission-processor-es_deployvar
+            source buildenvvar
+            ./master_deploy.sh -d ECS -e QA -t latest -s qa-global-appvar,qa-submission-processor-es_appvar -i submission-processor-es
+
   "build-prod":
     <<: *defaults
     steps:
@@ -70,6 +89,11 @@ workflows:
           filters:
             branches:
               only: develop
+      - "build-qa":
+          context : org-global
+          filters:
+            branches:
+              only: qa              
       - "build-prod":
           context : org-global
           filters:
