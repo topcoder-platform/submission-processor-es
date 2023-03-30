@@ -40,7 +40,7 @@ function * create (message) {
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
     body: message.payload,
-    refresh: true
+    refresh: 'wait_for'
   })
 
   // Add review / reviewSummation to submission
