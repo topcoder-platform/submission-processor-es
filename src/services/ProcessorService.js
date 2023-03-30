@@ -39,7 +39,8 @@ function * create (message) {
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
-    body: message.payload
+    body: message.payload,
+    refresh: true
   })
 
   // Add review / reviewSummation to submission
