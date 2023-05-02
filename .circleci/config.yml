@@ -61,11 +61,8 @@ workflows:
           branches:
             only:
             - develop
-            - feature/upsert
     - "build-prod":
         context: org-global
         filters:
           branches:
-            only:
-            - master
-            - feature/upsert
+            only: master
