@@ -105,7 +105,7 @@ function * update (message) {
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
     refresh: 'wait_for',
-    body: { doc: message.payload }
+    body: { doc: message.payload, doc_as_upsert: true }
   })
 
   if (message.payload.resource === 'review') {
