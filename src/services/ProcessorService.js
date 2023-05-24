@@ -29,15 +29,18 @@ function * getESData (id) {
  */
 function * create (message) {
   if (message.payload.resource === 'submission') {
-    message.payload.challengeId = message.payload.v5ChallengeId
-    delete message.payload.v5ChallengeId
+    if (message.payload.v5ChallengeId) {
+      message.payload.challengeId = message.payload.v5ChallengeId
+      delete message.payload.v5ChallengeId
+    }
   }
 
-  yield client.create({
+  yield client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
-    body: message.payload
+    refresh: 'wait_for',
+    body: { doc: message.payload, doc_as_upsert: true }
   })
 
   // Add review / reviewSummation to submission
@@ -89,15 +92,12 @@ create.schema = {
  */
 function * update (message) {
   if (message.payload.resource === 'submission') {
-    const legacyChallengeId = message.payload.challengeId
-    message.payload.challengeId = message.payload.v5ChallengeId
-    // Pure v5 challenges wont have legacy challenge id
-    // We compare to see if the two attributes are the same which is the case
-    // for pure v5 challenges
-    if (message.payload.challengeId !== message.payload.v5ChallengeId) {
+    if (message.payload.v5ChallengeId) {
+      const legacyChallengeId = message.payload.challengeId
+      message.payload.challengeId = message.payload.v5ChallengeId
       message.payload.legacyChallengeId = legacyChallengeId
+      delete message.payload.v5ChallengeId
     }
-    delete message.payload.v5ChallengeId
   }
 
   yield client.update({
