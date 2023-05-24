@@ -1,4 +1,6 @@
-# Topcoder - Submission Processor
+# Submission Processor - ElasticSearch Manager
+
+This processor only writes to ElasticSearch. It deals with the create, update and delete events of the Submission API
 
 ## Dependencies
 
