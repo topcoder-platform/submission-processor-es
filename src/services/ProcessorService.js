@@ -35,12 +35,12 @@ function * create (message) {
     }
   }
 
-  yield client.create({
+  yield client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
-    body: message.payload,
-    refresh: 'wait_for'
+    refresh: 'wait_for',
+    body: { doc: message.payload, doc_as_upsert: true }
   })
 
   // Add review / reviewSummation to submission
