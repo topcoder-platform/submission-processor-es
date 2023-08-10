@@ -18,6 +18,7 @@ module.exports = {
 
   esConfig: {
     HOST: process.env.ES_HOST,
+    HOST2: process.env.ES_HOST2,
     AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES
     API_VERSION: process.env.ES_API_VERSION || '6.3',
     ES_INDEX: process.env.ES_INDEX || 'submission',

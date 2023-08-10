@@ -5,7 +5,7 @@
 const _ = require('lodash')
 const expect = require('chai').expect
 const ProcessorService = require('../../src/services/ProcessorService')
-const uuid = require('uuid/v4')
+const { v4: uuid } = require('uuid')
 const co = require('co')
 const testHelper = require('../common/testHelper')
 const {

@@ -7,8 +7,10 @@ const Joi = require('joi')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
 const config = require('config')
+const { validate: uuidValidate } = require('uuid')
 
 const client = helper.getESClient()
+const clientNew = helper.getESClientNew()
 
 /**
  * Get elastic search data.
@@ -43,6 +45,14 @@ async function create (message) {
     body: { doc: message.payload, doc_as_upsert: true }
   })
 
+  await clientNew.update({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id: message.payload.id,
+    refresh: 'wait_for',
+    body: { doc: message.payload, doc_as_upsert: true }
+  })
+
   // Add review / reviewSummation to submission
   if (message.payload.resource === 'review') {
     const submission = await getESData(message.payload.submissionId)
@@ -57,6 +67,12 @@ async function create (message) {
       id: message.payload.submissionId,
       body: { doc: { review: reviewArr } }
     })
+    await clientNew.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: message.payload.submissionId,
+      body: { doc: { ...submission, review: reviewArr }, doc_as_upsert: true }
+    })
   } else if (message.payload.resource === 'reviewSummation') {
     const submission = await getESData(message.payload.submissionId)
     let reviewSummationArr = []
@@ -69,6 +85,12 @@ async function create (message) {
       type: config.get('esConfig.ES_TYPE'),
       id: message.payload.submissionId,
       body: { doc: { reviewSummation: reviewSummationArr } }
+    })
+    await clientNew.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: message.payload.submissionId,
+      body: { doc: { ...submission, reviewSummation: reviewSummationArr }, doc_as_upsert: true }
     })
   }
 }
@@ -93,14 +115,23 @@ create.schema = Joi.object({
 async function update (message) {
   if (message.payload.resource === 'submission') {
     if (message.payload.v5ChallengeId) {
-      const legacyChallengeId = message.payload.challengeId
       message.payload.challengeId = message.payload.v5ChallengeId
-      message.payload.legacyChallengeId = legacyChallengeId
+      if (!uuidValidate(message.payload.challengeId)) {
+        message.payload.legacyChallengeId = message.payload.challengeId
+      }
       delete message.payload.v5ChallengeId
     }
   }
 
   await client.update({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id: message.payload.id,
+    refresh: 'wait_for',
+    body: { doc: message.payload, doc_as_upsert: true }
+  })
+
+  await clientNew.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
@@ -121,6 +152,12 @@ async function update (message) {
       id: submission.id,
       body: { doc: { review: submission.review } }
     })
+    await clientNew.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: submission.id,
+      body: { doc: submission, doc_as_upsert: true }
+    })
   } else if (message.payload.resource === 'reviewSummation') {
     const reviewSummation = await getESData(message.payload.id)
     const submission = await getESData(reviewSummation.submissionId)
@@ -133,6 +170,12 @@ async function update (message) {
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
       body: { doc: { reviewSummation: submission.reviewSummation } }
+    })
+    await clientNew.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: submission.id,
+      body: { doc: submission, doc_as_upsert: true }
     })
   }
 }
@@ -155,6 +198,12 @@ async function remove (message) {
       id: submission.id,
       body: { doc: { review: submission.review } }
     })
+    await clientNew.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: submission.id,
+      body: { doc: submission, doc_as_upsert: true }
+    })
   } else if (message.payload.resource === 'reviewSummation') {
     const reviewSummation = await getESData(message.payload.id)
     const submission = await getESData(reviewSummation.submissionId)
@@ -165,9 +214,20 @@ async function remove (message) {
       id: submission.id,
       body: { doc: { reviewSummation: submission.reviewSummation } }
     })
+    await clientNew.update({
+      index: config.get('esConfig.ES_INDEX'),
+      type: config.get('esConfig.ES_TYPE'),
+      id: submission.id,
+      body: { doc: submission, doc_as_upsert: true }
+    })
   }
 
   await client.delete({
+    index: config.get('esConfig.ES_INDEX'),
+    type: config.get('esConfig.ES_TYPE'),
+    id: message.payload.id
+  })
+  await clientNew.delete({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id

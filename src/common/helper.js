@@ -38,6 +38,24 @@ function getESClient () {
   return esClients.client
 }
 
+function getESClientNew () {
+  const esHost = config.get('esConfig.HOST2')
+  if (!esClients.clientNew) {
+    // AWS ES configuration is different from other providers
+    esClients.clientNew = elasticsearch.Client({
+      apiVersion: config.get('esConfig.API_VERSION'),
+      hosts: esHost,
+      connectionClass: require('http-aws-es'), // eslint-disable-line global-require
+      amazonES: {
+        region: config.get('esConfig.AWS_REGION'),
+        credentials: new AWS.EnvironmentCredentials('AWS')
+      }
+    })
+  }
+  return esClients.clientNew
+}
+
 module.exports = {
-  getESClient
+  getESClient,
+  getESClientNew
 }
