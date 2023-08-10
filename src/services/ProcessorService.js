@@ -15,8 +15,8 @@ const client = helper.getESClient()
  * @param {String} id the Elastic search data id
  * @returns {Object} Data from Elastic search
  */
-function * getESData (id) {
-  return yield client.getSource({
+async function getESData (id) {
+  return await client.getSource({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id
@@ -27,7 +27,7 @@ function * getESData (id) {
  * Create message in Elasticsearch.
  * @param {Object} message the message
  */
-function * create (message) {
+async function create (message) {
   if (message.payload.resource === 'submission') {
     if (message.payload.v5ChallengeId) {
       message.payload.challengeId = message.payload.v5ChallengeId
@@ -35,7 +35,7 @@ function * create (message) {
     }
   }
 
-  yield client.update({
+  await client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
@@ -45,35 +45,35 @@ function * create (message) {
 
   // Add review / reviewSummation to submission
   if (message.payload.resource === 'review') {
-    const submission = yield getESData(message.payload.submissionId)
+    const submission = await getESData(message.payload.submissionId)
     let reviewArr = []
     reviewArr.push(_.omit(message.payload, ['resource']))
     if (submission.review) {
       reviewArr = reviewArr.concat(submission.review)
     }
-    yield client.update({
+    await client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: message.payload.submissionId,
-      body: { doc: {review: reviewArr} }
+      body: { doc: { review: reviewArr } }
     })
   } else if (message.payload.resource === 'reviewSummation') {
-    const submission = yield getESData(message.payload.submissionId)
+    const submission = await getESData(message.payload.submissionId)
     let reviewSummationArr = []
     reviewSummationArr.push(_.omit(message.payload, ['resource']))
     if (submission.reviewSummation) {
       reviewSummationArr = reviewSummationArr.concat(submission.reviewSummation)
     }
-    yield client.update({
+    await client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: message.payload.submissionId,
-      body: { doc: {reviewSummation: reviewSummationArr} }
+      body: { doc: { reviewSummation: reviewSummationArr } }
     })
   }
 }
 
-create.schema = {
+create.schema = Joi.object({
   message: Joi.object().keys({
     topic: Joi.string().required(),
     originator: Joi.string().required(),
@@ -84,13 +84,13 @@ create.schema = {
       id: Joi.string().required()
     }).unknown(true).required()
   }).required()
-}
+}).required()
 
 /**
  * Update message in Elasticsearch.
  * @param {Object} message the message
  */
-function * update (message) {
+async function update (message) {
   if (message.payload.resource === 'submission') {
     if (message.payload.v5ChallengeId) {
       const legacyChallengeId = message.payload.challengeId
@@ -100,7 +100,7 @@ function * update (message) {
     }
   }
 
-  yield client.update({
+  await client.update({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id,
@@ -109,30 +109,30 @@ function * update (message) {
   })
 
   if (message.payload.resource === 'review') {
-    const review = yield getESData(message.payload.id)
-    const submission = yield getESData(review.submissionId)
-    const reviewToBeUpdated = _.filter(submission.review, {id: message.payload.id})[0]
+    const review = await getESData(message.payload.id)
+    const submission = await getESData(review.submissionId)
+    const reviewToBeUpdated = _.filter(submission.review, { id: message.payload.id })[0]
     _.extend(reviewToBeUpdated, _.omit(message.payload, ['resource']))
-    _.remove(submission.review, {id: message.payload.id})
+    _.remove(submission.review, { id: message.payload.id })
     submission.review.push(reviewToBeUpdated)
-    yield client.update({
+    await client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
-      body: { doc: {review: submission.review} }
+      body: { doc: { review: submission.review } }
     })
   } else if (message.payload.resource === 'reviewSummation') {
-    const reviewSummation = yield getESData(message.payload.id)
-    const submission = yield getESData(reviewSummation.submissionId)
-    const reviewSummationToBeUpdated = _.filter(submission.reviewSummation, {id: message.payload.id})[0]
+    const reviewSummation = await getESData(message.payload.id)
+    const submission = await getESData(reviewSummation.submissionId)
+    const reviewSummationToBeUpdated = _.filter(submission.reviewSummation, { id: message.payload.id })[0]
     _.extend(reviewSummationToBeUpdated, _.omit(message.payload, ['resource']))
-    _.remove(submission.reviewSummation, {id: message.payload.id})
+    _.remove(submission.reviewSummation, { id: message.payload.id })
     submission.reviewSummation.push(reviewSummationToBeUpdated)
-    yield client.update({
+    await client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
-      body: { doc: {reviewSummation: submission.reviewSummation} }
+      body: { doc: { reviewSummation: submission.reviewSummation } }
     })
   }
 }
@@ -143,31 +143,31 @@ update.schema = create.schema
  * Remove message in Elasticsearch.
  * @param {Object} message the message
  */
-function * remove (message) {
+async function remove (message) {
   // Remove review / reviewSummation from submission data
   if (message.payload.resource === 'review') {
-    const review = yield getESData(message.payload.id)
-    const submission = yield getESData(review.submissionId)
-    _.remove(submission.review, {id: message.payload.id})
-    yield client.update({
+    const review = await getESData(message.payload.id)
+    const submission = await getESData(review.submissionId)
+    _.remove(submission.review, { id: message.payload.id })
+    await client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
-      body: { doc: {review: submission.review} }
+      body: { doc: { review: submission.review } }
     })
   } else if (message.payload.resource === 'reviewSummation') {
-    const reviewSummation = yield getESData(message.payload.id)
-    const submission = yield getESData(reviewSummation.submissionId)
-    _.remove(submission.reviewSummation, {id: message.payload.id})
-    yield client.update({
+    const reviewSummation = await getESData(message.payload.id)
+    const submission = await getESData(reviewSummation.submissionId)
+    _.remove(submission.reviewSummation, { id: message.payload.id })
+    await client.update({
       index: config.get('esConfig.ES_INDEX'),
       type: config.get('esConfig.ES_TYPE'),
       id: submission.id,
-      body: { doc: {reviewSummation: submission.reviewSummation} }
+      body: { doc: { reviewSummation: submission.reviewSummation } }
     })
   }
 
-  yield client.delete({
+  await client.delete({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id: message.payload.id

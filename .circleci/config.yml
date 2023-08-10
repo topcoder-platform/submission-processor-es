@@ -20,6 +20,15 @@ install_deploysuite: &install_deploysuite
     cp ./../buildscript/master_deploy.sh .
     cp ./../buildscript/buildenv.sh .
     cp ./../buildscript/awsconfiguration.sh .
+
+restore_cache_settings_for_build: &restore_cache_settings_for_build
+  key: docker-node-modules-{{ checksum "yarn.lock" }}
+
+save_cache_settings: &save_cache_settings
+  key: docker-node-modules-{{ checksum "yarn.lock" }}
+  paths:
+    - node_modules
+
 run_build: &run_build
   name: Installation of build dependencies.
   command: ./build.sh
@@ -35,9 +44,12 @@ jobs:
     - setup_remote_docker
     - run: *install_dependency
     - run: *install_deploysuite
+    - restore_cache: *restore_cache_settings_for_build
     - run: *run_build
+    - save_cache: *save_cache_settings
 
     - deploy:
+        name: Running MasterScript.
         command: "./awsconfiguration.sh DEV\nsource awsenvconf \n./buildenv.sh -e DEV -b submission-processor-es_deployvar\nsource buildenvvar\n./master_deploy.sh -d ECS -e DEV -t latest -s dev-global-appvar,submission-processor-es_appvar -i submission-processor-es\n#magic___^_^___line\n#magic___^_^___line\n"
   "build-prod":
     !!merge <<: *defaults
@@ -47,8 +59,11 @@ jobs:
     - setup_remote_docker
     - run: *install_dependency
     - run: *install_deploysuite
+    - restore_cache: *restore_cache_settings_for_build
     - run: *run_build
+    - save_cache: *save_cache_settings
     - deploy:
+        name: Running MasterScript.
         command: "./awsconfiguration.sh PROD\nsource awsenvconf \n./buildenv.sh -e PROD -b submission-processor-es_deployvar\nsource buildenvvar\n./master_deploy.sh -d ECS -e PROD -t latest -s prod-global-appvar,submission-processor-es_appvar -i submission-processor-es\n"
 workflows:
   version: 2

@@ -16,10 +16,10 @@ const esClients = {}
  */
 function getESClient () {
   const esHost = config.get('esConfig.HOST')
-  if (!esClients['client']) {
+  if (!esClients.client) {
     // AWS ES configuration is different from other providers
     if (/.*amazonaws.*/.test(esHost)) {
-      esClients['client'] = elasticsearch.Client({
+      esClients.client = elasticsearch.Client({
         apiVersion: config.get('esConfig.API_VERSION'),
         hosts: esHost,
         connectionClass: require('http-aws-es'), // eslint-disable-line global-require
@@ -29,13 +29,13 @@ function getESClient () {
         }
       })
     } else {
-      esClients['client'] = new elasticsearch.Client({
+      esClients.client = new elasticsearch.Client({
         apiVersion: config.get('esConfig.API_VERSION'),
         hosts: esHost
       })
     }
   }
-  return esClients['client']
+  return esClients.client
 }
 
 module.exports = {

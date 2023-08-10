@@ -4,7 +4,7 @@ This processor only writes to ElasticSearch. It deals with the create, update an
 
 ## Dependencies
 
-- nodejs https://nodejs.org/en/ (v8+)
+- nodejs https://nodejs.org/en/ (v18+)
 - Kafka
 - ElasticSearch
 - Docker, Docker Compose

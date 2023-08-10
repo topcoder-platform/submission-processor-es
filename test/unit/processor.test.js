@@ -8,10 +8,12 @@ const ProcessorService = require('../../src/services/ProcessorService')
 const uuid = require('uuid/v4')
 const co = require('co')
 const testHelper = require('../common/testHelper')
-const { submissionMessage, reviewMessage,
+const {
+  submissionMessage, reviewMessage,
   reviewTypeMessage, reviewSummationMessage,
   updatedSubmission, updatedReview,
-  updatedReviewType, updatedReviewSummation } = require('../common/testData')
+  updatedReviewType, updatedReviewSummation
+} = require('../common/testData')
 
 describe('TC Submission Processor Tests', () => {
   // test data

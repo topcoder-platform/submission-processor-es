@@ -1,13 +1,22 @@
 #!/bin/bash
 set -eo pipefail
-#ENV=$1
-#AWS_ACCOUNT_ID=$(eval "echo \$${ENV}_AWS_ACCOUNT_ID")
-#AWS_REGION=$(eval "echo \$${ENV}_AWS_REGION")
-#AWS_REPOSITORY=$(eval "echo \$${ENV}_AWS_REPOSITORY") 
-
-# Builds Docker image of the app.
-#TAG=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_REPOSITORY:$CIRCLE_BUILD_NUM
-#sed -i='' "s|submission-processor-es:latest|$TAG|" docker/docker-compose.yml
+UPDATE_CACHE=""
 echo "" > docker/api.env
 docker-compose -f docker/docker-compose.yml build submission-processor-es
-docker images
+docker create --name app submission-processor-es:latest
+
+if [ -d node_modules ]
+then
+  mv yarn.lock old-yarn.lock
+  docker cp app:/submission-processor-es/yarn.lock yarn.lock
+  set +eo pipefail
+  UPDATE_CACHE=$(cmp yarn.lock old-yarn.lock)
+  set -eo pipefail
+else
+  UPDATE_CACHE=1
+fi
+
+if [ "$UPDATE_CACHE" == 1 ]
+then
+  docker cp app:/submission-processor-es/node_modules .
+fi
