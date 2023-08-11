@@ -29,12 +29,10 @@
     "nyc": "^12.0.2"
   },
   "dependencies": {
-    "aws-sdk": "^2.286.2",
+    "@elastic/elasticsearch": "^6.8.8",
     "bluebird": "^3.7.2",
     "config": "^3.3.9",
-    "elasticsearch": "^15.1.1",
     "get-parameter-names": "^0.3.0",
-    "http-aws-es": "^6.0.0",
     "joi": "^17.9.2",
     "lodash": "^4.17.21",
     "no-kafka": "^3.4.3",

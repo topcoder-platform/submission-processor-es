@@ -76,6 +76,7 @@ workflows:
           branches:
             only:
             - develop
+            - feat/new-es
     - "build-prod":
         context: org-global
         filters:
