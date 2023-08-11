@@ -7,7 +7,6 @@ const _ = require('lodash')
 const config = require('config')
 const logger = require('./common/logger')
 const Kafka = require('no-kafka')
-const co = require('co')
 const ProcessorService = require('./services/ProcessorService')
 const healthcheck = require('topcoder-healthcheck-dropin')
 
@@ -19,7 +18,7 @@ if (config.KAFKA_CLIENT_CERT && config.KAFKA_CLIENT_CERT_KEY) {
 const consumer = new Kafka.SimpleConsumer(options)
 
 // data handler
-const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (m) => {
+const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, async (m) => {
   const message = m.message.value.toString('utf8')
   logger.info(`Handle Kafka event message; Topic: ${topic}; Partition: ${partition}; Offset: ${
     m.offset}; Message: ${message}.`)
@@ -37,24 +36,21 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, (
     // ignore the message
     return
   }
-  return co(function * () {
-    switch (topic) {
-      case config.CREATE_DATA_TOPIC:
-        yield ProcessorService.create(messageJSON)
-        break
-      case config.UPDATE_DATA_TOPIC:
-        yield ProcessorService.update(messageJSON)
-        break
-      case config.DELETE_DATA_TOPIC:
-        yield ProcessorService.remove(messageJSON)
-        break
-      default:
-        throw new Error(`Invalid topic: ${topic}`)
+  try {
+    if (topic === config.CREATE_DATA_TOPIC) {
+      await ProcessorService.create(messageJSON)
+    } else if (topic === config.UPDATE_DATA_TOPIC) {
+      await ProcessorService.update(messageJSON)
+    } else if (topic === config.DELETE_DATA_TOPIC) {
+      await ProcessorService.remove(messageJSON)
+    } else {
+      throw new Error(`Invalid topic: ${topic}`)
     }
-  })
-    // commit offset
-    .then(() => consumer.commitOffset({ topic, partition, offset: m.offset }))
-    .catch((err) => logger.error(err))
+  } catch (err) {
+    logger.logFullError(err)
+  } finally {
+    await consumer.commitOffset({ topic, partition, offset: m.offset })
+  }
 })
 
 // check if there is kafka connection alive
@@ -64,7 +60,9 @@ function check () {
   }
   let connected = true
   consumer.client.initialBrokers.forEach(conn => {
-    logger.debug(`url ${conn.server()} - connected=${conn.connected}`)
+    if (!conn.connected) {
+      logger.error(`url ${conn.server()} - connected=${conn.connected}`)
+    }
     connected = conn.connected & connected
   })
   return connected

@@ -1,5 +1,5 @@
-# Use the base image with Node.js 8.11.3
-FROM node:8.11.3
+# Use the base image with Node.js 18.16.1
+FROM node:18.16.1
 
 # Copy the current directory into the Docker image
 COPY . /submission-processor-es
@@ -8,5 +8,5 @@ COPY . /submission-processor-es
 WORKDIR /submission-processor-es
 
 # Install the dependencies from package.json
-RUN npm install
-CMD npm start
+RUN yarn install
+CMD node src/app.js

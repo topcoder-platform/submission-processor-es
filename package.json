@@ -5,8 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "lint": "standard",
-    "lint:fix": "standard --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "init-es": "node src/init-es.js",
     "view-data": "node test/common/view-data.js",
     "test": "mocha test/unit/*.test.js --require test/unit/prepare.js --exit",
@@ -18,33 +18,40 @@
   "license": "none",
   "devDependencies": {
     "chai": "^4.1.1",
+    "eslint": "^8.0.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
     "mocha": "^3.5.0",
     "mocha-prepare": "^0.1.0",
     "nock": "^9.4.4",
-    "nyc": "^12.0.2",
-    "standard": "^11.0.1",
-    "uuid": "^3.3.2"
+    "nyc": "^12.0.2"
   },
   "dependencies": {
     "aws-sdk": "^2.286.2",
-    "bluebird": "^3.5.1",
-    "co": "^4.6.0",
-    "config": "^1.21.0",
+    "bluebird": "^3.7.2",
+    "config": "^3.3.9",
     "elasticsearch": "^15.1.1",
     "get-parameter-names": "^0.3.0",
     "http-aws-es": "^6.0.0",
-    "joi": "^9.0.4",
-    "lodash": "^4.17.10",
-    "no-kafka": "^3.2.4",
+    "joi": "^17.9.2",
+    "lodash": "^4.17.21",
+    "no-kafka": "^3.4.3",
     "topcoder-healthcheck-dropin": "^1.0.2",
-    "winston": "^2.2.0"
+    "uuid": "^9.0.0",
+    "winston": "^3.10.0"
   },
   "engines": {
-    "node": "8.x"
+    "node": "18.x"
   },
   "standard": {
     "env": [
       "mocha"
     ]
+  },
+  "volta": {
+    "node": "18.16.1",
+    "yarn": "1.22.19"
   }
 }

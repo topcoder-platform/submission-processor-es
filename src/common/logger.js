@@ -4,17 +4,20 @@
 'use strict'
 
 const _ = require('lodash')
-const Joi = require('joi')
-const winston = require('winston')
+const { attempt } = require('joi')
+const { createLogger, format, transports } = require('winston')
 const util = require('util')
 const config = require('config')
 const getParams = require('get-parameter-names')
 
-const transports = []
-if (!config.DISABLE_LOGGING) {
-  transports.push(new (winston.transports.Console)({ level: config.LOG_LEVEL }))
-}
-const logger = new (winston.Logger)({ transports })
+const logger = createLogger({
+  level: config.LOG_LEVEL,
+  transports: [
+    new transports.Console({
+      format: format.printf((info) => `${info.level}: ${info.message}`)
+    })
+  ]
+})
 
 /**
  * Log error details with signature
@@ -34,26 +37,7 @@ logger.logFullError = function (err, signature) { // eslint-disable-line
   logger.error(util.inspect(err))
   if (!err.logged) {
     logger.error(err.stack)
-  }
-  err.logged = true
-}
-
-/**
- * Sanitize object.
- * @param {Object} obj the object
- * @returns {Object} the new object with removed properties
- * @private
- */
-function _sanitizeObject (obj) {
-  try {
-    return JSON.parse(JSON.stringify(obj, (name, value) => {
-      if (_.isArray(value) && value.length > 30) {
-        return 'Array(' + value.length + ')'
-      }
-      return value
-    }))
-  } catch (e) {
-    return obj
+    err.logged = true
   }
 }
 
@@ -81,18 +65,17 @@ logger.decorateWithLogging = function (service) {
   }
   _.each(service, (method, name) => {
     const params = method.params || getParams(method)
-    service[name] = function * () {
+    service[name] = async function () {
       logger.debug('ENTER ' + name)
       logger.debug('input arguments')
       const args = Array.prototype.slice.call(arguments)
-      logger.debug(util.inspect(_sanitizeObject(_combineObject(params, args))))
+      logger.debug(util.inspect((_combineObject(params, args)), { breakLength: Infinity, maxArrayLength: 5 }))
       try {
-        const result = yield * method.apply(this, arguments)
+        const result = await method.apply(this, arguments)
         logger.debug('EXIT ' + name)
-        logger.debug('output arguments')
         if (result !== null && result !== undefined) {
           logger.debug('output arguments')
-          logger.debug(util.inspect(_sanitizeObject(result)))
+          logger.debug(util.inspect(result, { breakLength: Infinity, maxArrayLength: 5 }))
         }
         return result
       } catch (e) {
@@ -115,10 +98,10 @@ logger.decorateWithValidators = function (service) {
       return
     }
     const params = getParams(method)
-    service[name] = function * () {
+    service[name] = async function () {
       const args = Array.prototype.slice.call(arguments)
       const value = _combineObject(params, args)
-      const normalized = Joi.attempt(value, method.schema)
+      const normalized = attempt(value, method.schema)
       const newArgs = []
       // Joi will normalize values
       // for example string number '1' to 1
@@ -126,7 +109,7 @@ logger.decorateWithValidators = function (service) {
       _.each(params, (param) => {
         newArgs.push(normalized[param])
       })
-      return yield method.apply(this, newArgs)
+      return method.apply(this, newArgs)
     }
     service[name].params = params
   })
