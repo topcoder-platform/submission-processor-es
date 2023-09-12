@@ -159,6 +159,7 @@ async function remove (message) {
     })
   } else if (message.payload.resource === 'reviewSummation') {
     const reviewSummation = await getESData(message.payload.id)
+    console.log('ReviewSummation', reviewSummation);
     const submission = await getESData(reviewSummation.submissionId)
     _.remove(submission.reviewSummation, { id: message.payload.id })
     await client.update({
