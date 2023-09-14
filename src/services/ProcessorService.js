@@ -17,11 +17,12 @@ const client = helper.getESClient()
  * @returns {Object} Data from Elastic search
  */
 async function getESData (id) {
-  return await client.getSource({
+  const result = await client.getSource({
     index: config.get('esConfig.ES_INDEX'),
     type: config.get('esConfig.ES_TYPE'),
     id
   })
+  return result.body
 }
 
 /**
