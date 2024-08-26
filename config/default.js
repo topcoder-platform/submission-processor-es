@@ -16,10 +16,9 @@ module.exports = {
   UPDATE_DATA_TOPIC: process.env.UPDATE_DATA_TOPIC || 'submission.notification.update',
   DELETE_DATA_TOPIC: process.env.DELETE_DATA_TOPIC || 'submission.notification.delete',
 
-  esConfig: {
-    HOST: process.env.ES_HOST,
-    API_VERSION: process.env.ES_API_VERSION || '6.3',
-    ES_INDEX: process.env.ES_INDEX || 'submission',
-    ES_TYPE: process.env.ES_TYPE || '_doc' // ES 6.x accepts only 1 Type per index and it's mandatory to define it
+  osConfig: {
+    HOST: process.env.OS_HOST,
+    API_VERSION: process.env.OS_API_VERSION || '6.3',
+    OS_INDEX: process.env.OS_INDEX || 'submission'
   }
 }

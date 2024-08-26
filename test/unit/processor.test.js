@@ -20,7 +20,7 @@ describe('TC Submission Processor Tests', () => {
   it('create submission message', (done) => {
     co(function * () {
       yield ProcessorService.create(submissionMessage)
-      const data = yield testHelper.getESData(submissionMessage.payload.id)
+      const data = yield testHelper.getOSData(submissionMessage.payload.id)
       testHelper.expectObject(data, submissionMessage.payload)
     })
       .then(() => done())
@@ -47,7 +47,7 @@ describe('TC Submission Processor Tests', () => {
   it('update submission message', (done) => {
     co(function * () {
       yield ProcessorService.update(updatedSubmission)
-      const data = yield testHelper.getESData(updatedSubmission.payload.id)
+      const data = yield testHelper.getOSData(updatedSubmission.payload.id)
       testHelper.expectObject(data, updatedSubmission.payload)
     })
       .then(() => done())
@@ -78,7 +78,7 @@ describe('TC Submission Processor Tests', () => {
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(message.payload.id)
+        yield testHelper.getOSData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -110,7 +110,7 @@ describe('TC Submission Processor Tests', () => {
   it('create review message', (done) => {
     co(function * () {
       yield ProcessorService.create(reviewMessage)
-      const data = yield testHelper.getESData(reviewMessage.payload.id)
+      const data = yield testHelper.getOSData(reviewMessage.payload.id)
       testHelper.expectObject(data, reviewMessage.payload)
     })
       .then(() => done())
@@ -137,7 +137,7 @@ describe('TC Submission Processor Tests', () => {
   it('update review message', (done) => {
     co(function * () {
       yield ProcessorService.update(updatedReview)
-      const data = yield testHelper.getESData(updatedReview.payload.id)
+      const data = yield testHelper.getOSData(updatedReview.payload.id)
       testHelper.expectObject(data, updatedReview.payload)
     })
       .then(() => done())
@@ -169,7 +169,7 @@ describe('TC Submission Processor Tests', () => {
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(message.payload.id)
+        yield testHelper.getOSData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -201,7 +201,7 @@ describe('TC Submission Processor Tests', () => {
   it('create review type message', (done) => {
     co(function * () {
       yield ProcessorService.create(reviewTypeMessage)
-      const data = yield testHelper.getESData(reviewTypeMessage.payload.id)
+      const data = yield testHelper.getOSData(reviewTypeMessage.payload.id)
       testHelper.expectObject(data, reviewTypeMessage.payload)
     })
       .then(() => done())
@@ -228,7 +228,7 @@ describe('TC Submission Processor Tests', () => {
   it('update review type message', (done) => {
     co(function * () {
       yield ProcessorService.update(updatedReviewType)
-      const data = yield testHelper.getESData(updatedReviewType.payload.id)
+      const data = yield testHelper.getOSData(updatedReviewType.payload.id)
       testHelper.expectObject(data, updatedReviewType.payload)
     })
       .then(() => done())
@@ -260,7 +260,7 @@ describe('TC Submission Processor Tests', () => {
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(message.payload.id)
+        yield testHelper.getOSData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)
@@ -292,7 +292,7 @@ describe('TC Submission Processor Tests', () => {
   it('create review summation message', (done) => {
     co(function * () {
       yield ProcessorService.create(reviewSummationMessage)
-      const data = yield testHelper.getESData(reviewSummationMessage.payload.id)
+      const data = yield testHelper.getOSData(reviewSummationMessage.payload.id)
       testHelper.expectObject(data, reviewSummationMessage.payload)
     })
       .then(() => done())
@@ -319,7 +319,7 @@ describe('TC Submission Processor Tests', () => {
   it('update review summation message', (done) => {
     co(function * () {
       yield ProcessorService.update(updatedReviewSummation)
-      const data = yield testHelper.getESData(updatedReviewSummation.payload.id)
+      const data = yield testHelper.getOSData(updatedReviewSummation.payload.id)
       testHelper.expectObject(data, updatedReviewSummation.payload)
     })
       .then(() => done())
@@ -351,7 +351,7 @@ describe('TC Submission Processor Tests', () => {
     co(function * () {
       yield ProcessorService.remove(message)
       try {
-        yield testHelper.getESData(message.payload.id)
+        yield testHelper.getOSData(message.payload.id)
       } catch (err) {
         expect(err).to.exist // eslint-disable-line
         expect(err.statusCode).to.equal(404)

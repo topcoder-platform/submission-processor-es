@@ -29,7 +29,7 @@
     "nyc": "^12.0.2"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^6.8.8",
+    "@opensearch-project/opensearch": "^2.11.0",
     "bluebird": "^3.7.2",
     "config": "^3.3.9",
     "get-parameter-names": "^0.3.0",
