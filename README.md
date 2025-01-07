@@ -1,12 +1,12 @@
-# Submission Processor - ElasticSearch Manager
+# Submission Processor - Opensearch Manager
 
-This processor only writes to ElasticSearch. It deals with the create, update and delete events of the Submission API
+This processor only writes to Opensearch. It deals with the create, update and delete events of the Submission API
 
 ## Dependencies
 
 - nodejs https://nodejs.org/en/ (v18+)
 - Kafka
-- ElasticSearch
+- Opensearch
 - Docker, Docker Compose
 
 ## Configuration
@@ -26,7 +26,7 @@ The following parameters can be set in config files or in env variables:
 - UPDATE_DATA_TOPIC: update data Kafka topic, default value is 'submission.notification.update'
 - DELETE_DATA_TOPIC: delete data Kafka topic, default value is 'submission.notification.delete'
 
-Refer to `esConfig` variable in `config/default.js` for ES related configuration.
+Refer to `osConfig` variable in `config/default.js` for OS related configuration.
 
 Also note that there is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
@@ -61,7 +61,7 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 
 - install dependencies `npm i`
 - run code lint check `npm run lint`, running `npm run lint-fix` can fix some lint errors if any
-- initialize Elasticsearch, create configured Elasticsearch index if not present: `npm run init-es`
+- initialize Opensearch, create configured Opensearch index if not present: `npm run init-es`
 - or to re-create the index: `npm run init-es force`
 - run tests `npm run test`
 - start processor app `npm start`
@@ -88,10 +88,10 @@ docker-compose up
 
 Integration tests use different index `submission-test` which is not same as the usual index `submission`.
 
-Please ensure to create the index `submission-test` or the index specified in the environment variable `ES_INDEX_TEST` before running the Integration tests. You could re-use the existing scripts to create index but you would need to set the below environment variable
+Please ensure to create the index `submission-test` or the index specified in the environment variable `OS_INDEX_TEST` before running the Integration tests. You could re-use the existing scripts to create index but you would need to set the below environment variable
 
 ```
-export ES_INDEX=submission-test
+export OS_INDEX=submission-test
 ```
 
 #### Running unit tests and coverage
@@ -125,7 +125,7 @@ npm run cov-e2e
 
 ## Verification
 
-- start kafka server, start elasticsearch, initialize Elasticsearch, start processor app
+- start kafka server, start Opensearch, initialize Opensearch, start processor app
 - start kafka-console-producer to write messages to `submission.notification.create` topic:
   `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic submission.notification.create`
 - write message:
@@ -133,7 +133,7 @@ npm run cov-e2e
 - run command `npm run view-data 1111` to view the created data, you will see the data are properly created:
 
 ```bash
-info: Elasticsearch data:
+info: Opensearch data:
 info: {
     "resource": "submission",
     "id": "1111",
@@ -159,7 +159,7 @@ info: {
 - run command `npm run view-data 1111` to view the created data, you will see the data are properly updated:
 
 ```bash
-info: Elasticsearch data:
+info: Opensearch data:
 info: {
     "resource": "submission",
     "id": "1111",

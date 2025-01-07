@@ -7,17 +7,16 @@ const config = require('config')
 const expect = require('chai').expect
 const helper = require('../../src/common/helper')
 
-const client = helper.getESClient()
+const client = helper.getOSClient()
 
 /**
- * Get elastic search data.
- * @param {String} id the Elastic search data id
- * @returns {Object} the elastic search data of id of configured index type in configured index
+ * Get opensearch data.
+ * @param {String} id the opensearch data id
+ * @returns {Object} the opensearch data of id of configured index type in configured index
  */
-function * getESData (id) {
+function * getOSData (id) {
   return yield client.getSource({
-    index: config.get('esConfig.ES_INDEX'),
-    type: config.get('esConfig.ES_TYPE'),
+    index: config.get('osConfig.OS_INDEX'),
     id
   })
 }
@@ -34,6 +33,6 @@ function expectObject (target, expected) {
 }
 
 module.exports = {
-  getESData,
+  getOSData,
   expectObject
 }

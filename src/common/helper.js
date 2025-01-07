@@ -3,21 +3,21 @@
  */
 
 const config = require('config')
-const elasticsearch = require('@elastic/elasticsearch')
-// ES Client mapping
-const esClients = {}
+const opensearch = require('@opensearch-project/opensearch')
+// OS Client mapping
+const osClients = {}
 
 /**
- * Get ES Client
- * @return {Object} Elastic Host Client Instance
+ * Get OS Client
+ * @return {Object} Opensearch Host Client Instance
  */
-function getESClient () {
-  if (!esClients.client) {
-    esClients.client = new elasticsearch.Client({ node: config.get('esConfig.HOST') })
+function getOSClient () {
+  if (!osClients.client) {
+    osClients.client = new opensearch.Client({ node: config.get('osConfig.HOST') })
   }
-  return esClients.client
+  return osClients.client
 }
 
 module.exports = {
-  getESClient
+  getOSClient
 }
